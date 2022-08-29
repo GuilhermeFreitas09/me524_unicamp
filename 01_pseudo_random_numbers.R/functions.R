@@ -1,4 +1,4 @@
-# Funções auxiliares
+# Função para obter o período
 
 get_period <- function(vec){
   
@@ -6,6 +6,10 @@ get_period <- function(vec){
   # pseudo aleatórios (não necessariamente gerados por geradores congruenciais)
   
   i = 2; n = length(vec)
+  
+  if(sum(vec==vec[1]) < 2){
+    return("Não foi possível encontrar o período para essa série. Tente aumentar o tamanho do vetor.")
+  }
   
   found = FALSE
   
@@ -22,7 +26,9 @@ get_period <- function(vec){
   }
   
   if(found){
-    print(paste("Periodo igual a ", i-1, sep = ""))
+    return(paste("Periodo igual a ", i-1, sep = ""))
+  }else{
+    return("Não foi possível encontrar o período para essa série. Tente aumentar o tamanho do vetor.")
   }
 }
 
@@ -43,14 +49,6 @@ cong_gen <- function(a = 22, m = 61, c = 5, x1 = 1, n = 1000){
   return(vec)
 }
 
-test <- cong_gen()
-
-get_period(test)
-
-test <- cong_gen(m=63)
-
-get_period(test)
-
 # Gerador congruencial multiplicativo
 
 cong_gen_mult <- function(m = 13, a = 2, x1 = 1, n = 1000){
@@ -68,13 +66,3 @@ cong_gen_mult <- function(m = 13, a = 2, x1 = 1, n = 1000){
   
   return(vec)
 }
-
-test <- cong_gen_mult()
-
-get_period(test)
-
-test <- cong_gen_mult(m=16, a=4)
-
-get_period(test)
-
-

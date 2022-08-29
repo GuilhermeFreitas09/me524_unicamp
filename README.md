@@ -1,1 +1,1 @@
-Repositório referente à disciplina ME524.
+Repository for the discipline ME524.
