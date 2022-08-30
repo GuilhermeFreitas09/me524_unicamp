@@ -69,3 +69,5 @@ get_period(vec) # período igual a 66
 # 2.7
 
 ## (aX_{i-1}+c) mod (r^b + s((aX_{i-1}+c) div r^b)) < (1+s)(r^b - s)
+
+
