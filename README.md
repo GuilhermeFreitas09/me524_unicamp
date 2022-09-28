@@ -1,1 +1,1 @@
-Repository for the discipline ME524.
+ME524 repository.
