@@ -1,0 +1,140 @@
+---
+title: "Exemplos"
+author: "Guilherme Freitas" 
+output: html_document
+date: "2022-11-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Distrubuição qui-quadrado não central
+
+```{r}
+set.seed(2019)
+
+n = 1000000
+
+x_exp_sample = rexp(n)
+hist(x_exp_sample)
+
+fx_unnormalized = 5*dchisq(x_exp_sample, df=5)
+gx = dexp(x_exp_sample)
+
+weight = fx_unnormalized/gx
+weight_norm = weight/sum(weight)
+
+fx_sample = sample(x_exp_sample, size=n, replace=TRUE, prob = weight_norm)
+
+par(mfrow=c(1,2))
+x = rchisq(n, df=5)
+hist(x[x<15], breaks=seq(0, 15,1), main='Chi-Square')
+hist(fx_sample, breaks=seq(0, 15, 1), main='g ~ Exp(1)')
+
+```
+
+
+# Distribuição normal
+
+```{r}
+set.seed(1231354)
+N      = 10000
+xx = seq(-6,6,length=1000)
+
+par(mfrow=c(1,3))
+
+hist(rnorm(N), main = 'N(0,1)', xlab = '', prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
+lines(xx,dnorm(xx),col=2,lwd=2)
+
+## SIR: Uniform proposal
+
+N      = 10000
+m      = 2000
+draw1  = runif(N,-10,10)
+w      = dnorm(draw1)/0.05
+ind    = sample(1:N,size=m,replace=TRUE,prob=w)
+draws1 = draw1[ind]
+draws2 = draws1
+hist(draws1,xlab="",ylab="",main="g ~ U(-10, 10)",prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
+lines(xx,dnorm(xx),col=2,lwd=2)
+length(unique(draws1))/m
+
+## SIR: Cauchy proposal
+draw1  = rcauchy(N) # t-student vira a cauchy quando df=1
+w      = dnorm(draw1)/dcauchy(draw1)
+ind    = sample(1:N,size=m,prob=w)
+draws1 = draw1[ind]
+hist(draws1,xlab="",ylab="",main="g ~ Cauchy(0, 1)",prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
+lines(xx,dnorm(xx),col=2,lwd=2)
+length(unique(draws1))/m
+```
+
+# Outros testes
+
+```{r}
+draw1  = rt(N,1) # t-student vira a cauchy quando df=1
+w      = dnorm(draw1)/dt(draw1,1)
+ind    = sample(1:N,size=m,replace=TRUE,prob=w)
+draws1 = draw1[ind]
+hist(draws1,xlab="",ylab="",main="g ~ Cauchy(0, 1)",prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
+lines(xx,dnorm(xx),col=2,lwd=2)
+length(unique(draws1))/m
+```
+
+
+
+```{r}
+draw1  = rnorm(N) # t-student vira a cauchy quando df=1
+w      = dcauchy(draw1)/dnorm(draw1)
+ind    = sample(1:N,size=m,replace=TRUE,prob=w)
+draws1 = draw1[ind]
+hist(draws1,xlab="",ylab="",main="g ~ Cauchy(0, 1)",prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
+lines(xx,dcauchy(xx),col=2,lwd=2)
+length(unique(draws1))/m
+```
+
+
+```{r}
+
+library(ggplot2)
+library(gridExtra)
+
+f1 = ggplot(data.frame(data = rnorm(N)), aes(x = data)) + 
+  geom_histogram(aes(y = ..density..),
+                 colour = 1, fill = "white") +
+  geom_density(lwd = 1, colour = 4,
+               fill = 4, alpha = 0.25) +
+    theme_bw()
+
+f2 = ggplot(data.frame(draws1), aes(x = draws1)) + 
+  geom_histogram(aes(y = ..density..),
+                 colour = 1, fill = "white") +
+  geom_density(lwd = 1, colour = 4,
+               fill = 4, alpha = 0.25)
+
+f3 = ggplot(data.frame(draws2), aes(x = draws2)) + 
+  geom_histogram(aes(y = ..density..),
+                 colour = 1, fill = "white") +
+  geom_density(lwd = 1, colour = 4,
+               fill = 4, alpha = 0.25)
+
+grid.arrange(f1, f2, f3, ncol=3)
+```
+
+
+```{r}
+plot(ecdf(rnorm(N)))
+lines(ecdf(draws1), col='red')
+lines(ecdf(draws2), col='blue')
+
+```
+
+```{r}
+ks.test(rnorm(N), draws1)
+```
+```{r}
+ks.test(rnorm(N), draws2)
+
+```
+A distribuição Cauchy se saiu melhor.

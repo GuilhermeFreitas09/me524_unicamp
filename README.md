@@ -1,1 +1,1 @@
-ME524 repository.
+ME524 study repository.
