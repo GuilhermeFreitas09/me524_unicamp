@@ -14,7 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 set.seed(2019)
 
-n = 1000000
+n = 100000
+m = 2000
 
 x_exp_sample = rexp(n)
 hist(x_exp_sample)
@@ -25,13 +26,16 @@ gx = dexp(x_exp_sample)
 weight = fx_unnormalized/gx
 weight_norm = weight/sum(weight)
 
-fx_sample = sample(x_exp_sample, size=n, replace=TRUE, prob = weight_norm)
+fx_sample = sample(x_exp_sample, size=m, replace=FALSE, prob = weight_norm)
 
 par(mfrow=c(1,2))
 x = rchisq(n, df=5)
 hist(x[x<15], breaks=seq(0, 15,1), main='Chi-Square')
 hist(fx_sample, breaks=seq(0, 15, 1), main='g ~ Exp(1)')
 
+```
+```{r}
+ks.test(x, fx_sample)
 ```
 
 
@@ -70,6 +74,50 @@ lines(xx,dnorm(xx),col=2,lwd=2)
 length(unique(draws1))/m
 ```
 
+
+```{r}
+set.seed(1231354)
+N = 10000
+xx = seq(-6,6,length=1000)
+x = rnorm(N)
+hist(rnorm(N), main = 'N(0,1)', xlab = '', prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
+lines(xx,dnorm(xx),col=2,lwd=2)
+```
+
+
+```{r}
+set.seed(1231354)
+N      = 10000
+m      = 2000
+draw1  = runif(N,-10,10)
+w      = dnorm(draw1)/(1/20)
+ind    = sample(1:N,size=m,replace=TRUE,prob=w)
+draws1 = draw1[ind]
+hist(draws1,xlab="",ylab="",main="g ~ U(-10, 10)",prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
+lines(xx,dnorm(xx),col=2,lwd=2)
+```
+
+```{r}
+ks.test(x, draws1)
+```
+```{r}
+## SIR: Cauchy proposal
+set.seed(1231354)
+draw1  = rcauchy(N) # t-student vira a cauchy quando df=1
+w      = dnorm(draw1)/dcauchy(draw1)
+ind    = sample(1:N,size=m,prob=w, replace = FALSE)
+draws1 = draw1[ind]
+hist(draws1,xlab="",ylab="",main="g ~ Cauchy(0, 1)",prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
+lines(xx,dnorm(xx),col=2,lwd=2)
+length(unique(draws1))/m
+```
+
+
+```{r}
+ks.test(x, draws1)
+```
+
+
 # Outros testes
 
 ```{r}
@@ -81,8 +129,6 @@ hist(draws1,xlab="",ylab="",main="g ~ Cauchy(0, 1)",prob=TRUE,ylim=c(0,0.45),xli
 lines(xx,dnorm(xx),col=2,lwd=2)
 length(unique(draws1))/m
 ```
-
-
 
 ```{r}
 draw1  = rnorm(N) # t-student vira a cauchy quando df=1
