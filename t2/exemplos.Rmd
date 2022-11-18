@@ -1,6 +1,6 @@
 ---
-title: "Exemplos"
-author: "Guilherme Pereira de Freitas" 
+title: "Trabalho ME524 - Exemplos"
+author: "Guilherme Pereira de Freitas"
 output: html_document
 date: "2022-11-13"
 ---
@@ -9,7 +9,7 @@ date: "2022-11-13"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Distribuição normal partindo de uma uniforme e uma cauchy
+# Distribuição normal partindo de uma uniforme(-10,10) e uma cauchy(0,1)
 
 ```{r}
 set.seed(1231354)
@@ -18,30 +18,39 @@ xx = seq(-6,6,length=1000)
 
 par(mfrow=c(1,3))
 
+# Normal sample
 hist(rnorm(N), main = 'N(0,1)', xlab = '', prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
 lines(xx,dnorm(xx),col=2,lwd=2)
 
-## SIR: Uniform proposal
+# SIR: Uniform proposal
 
+## resampling size
 m = 5000
+## uniform sample 
 draw1 = runif(N,-10,10)
+## weights
 w = dnorm(draw1)/0.05
+## resampling
 ind = sample(1:N,size=m,replace=TRUE,prob=w)
 draws1 = draw1[ind]
+## figure
 hist(draws1,xlab="",ylab="",main="g ~ U(-10, 10)",prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
 lines(xx,dnorm(xx),col=2,lwd=2)
-length(unique(draws1))/m
 ks.test(rnorm(m), draws1)
 
 
-## SIR: Cauchy proposal
+# SIR: Cauchy proposal
+
+## cauchy sample
 draw1 = rcauchy(N)
+## weights
 w = dnorm(draw1)/dcauchy(draw1)
+## resampling given weights
 ind = sample(1:N,size=m,prob=w)
 draws1 = draw1[ind]
+## figure
 hist(draws1,xlab="",ylab="",main="g ~ Cauchy(0, 1)",prob=TRUE,ylim=c(0,0.45),xlim=c(-5,5))
 lines(xx,dnorm(xx),col=2,lwd=2)
-length(unique(draws1))/m
 ks.test(rnorm(m), draws1)
 ```
 
@@ -50,19 +59,25 @@ ks.test(rnorm(m), draws1)
 ```{r}
 set.seed(120)
 
+# sample sizes
 n = 100000
 m = 5000
 
+# exponential sample
 x_exp_sample = rexp(n)
 
+# f(x) & g(x)
 fx_unnormalized = 5*dchisq(x_exp_sample, df=5, ncp=0)
 gx = dexp(x_exp_sample)
 
+# weights unnormalized and normalized
 weight = fx_unnormalized/gx
 weight_norm = weight/sum(weight)
 
+# resampling
 fx_sample = sample(x_exp_sample, size=m, replace=TRUE, prob = weight_norm)
 
+# Figures
 par(mfrow=c(1,2))
 x = rchisq(n, df=5)
 hist(x[x<15], breaks=seq(0, 15,1), main='Chi-Square(5, 0)', prob=TRUE,ylim=c(0,0.17), xlab='')
